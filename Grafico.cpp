@@ -150,22 +150,22 @@ char texto[30];
 
 ///jogo pong
 //tamanho de tela e frames
-	int width = 500;
-	int height = 200;
+	int width = 600;
+	int height = 700;
 	int intervalo = 1000/60;
 //pontuação
 	int score_p1 = 0;
 	int score_p2 = 0;
 //raquetes
-	int base=40;
+	int base=50;
 	int altura =10;
-	int velocidade = 4;
+	int velocidade = 5;
 	Raquete jogador_1(base, altura, velocidade,width/2,0.0+altura);
 	Raquete jogador_2(base,altura,velocidade,width/2,height-altura-10);
 //bola
-	int tamanho_bola = 10;
-	int velocidade_bola = 1;
-	Bola bola_1(velocidade_bola,tamanho_bola,width/2,height/2,-1.0f,0.0f);
+	int tamanho_bola =8;
+	int velocidade_bola =3;
+	Bola bola_1(velocidade_bola,tamanho_bola,width/2,height/2,0.0f,-1.0f);
 /// fim do jogo
 
 int getWidth()
@@ -396,9 +396,9 @@ void draw_pong(void)
 	draw_bola(bola_1);
 	//desenho da pontuação no centro da tela
 	//int x_pos = (((int)width/2)-80),y_pos=(height-15);
-	int x_pos = 15,y_pos=(((int)height/2)+15);
-	//std::cout << x_pos <<"  "<<y_pos<<std::endl;
-	std::string msg="Jogador 1:"+std::to_string(score_p1) + " <placar> Jogador 2:" + std::to_string(score_p1);
+	int x_pos = 5,y_pos=(((int)height/2)+15);
+	//int x_pos = 15, y_pos =height-15;
+	std::string msg="Jogador 1:"+std::to_string(score_p1) + " <placar> Jogador 2:" + std::to_string(score_p2);
 	draw_text(x_pos, y_pos, msg);
 	// similar ao flush + eficiente
 	glutSwapBuffers();
@@ -509,16 +509,19 @@ void update_bola()
 {
 	GLfloat x_ = bola_1.getPosition(0), x_dir = bola_1.getDirection(0);
 	GLfloat y_ = bola_1.getPosition(1),y_dir=bola_1.getDirection(1);
-	bola_1.showBola();
-	x_ += x_ * x_dir;
-	y_ += y_ * y_dir;
+	int speed_ = bola_1.getSpeed();
+	//std::cout << "valor de x:" << x_ << std::endl;
+	//std::cout << "valor de y:" << y_ << std::endl;
+	//std::cout << "valor de dx:" << x_dir << std::endl;
+	//std::cout << "valor de dy:" << y_dir<< std::endl;
+	x_ += x_dir * speed_;
+	y_ += y_dir * speed_;
 	bola_1.setPosition(x_,y_);
-	/* 
-	//*verifica se a bola bateu no jogador 1
-	if (y_<jogador_1.getPosition(1) + jogador_1.getHeight() && y_>jogador_1.getPosition(1) && x_<jogador_1.getPosition(0) + jogador_1.getWidth() && x_>jogador_1.getPosition(0))
+
+	if(y_<jogador_1.getPosition(1) + jogador_1.getHeight() && y_>jogador_1.getPosition(1) && x_<jogador_1.getPosition(0) + jogador_1.getWidth() && x_>jogador_1.getPosition(0))
 	{
 		GLfloat m = ((x_ - jogador_1.getPosition(0)) / jogador_1.getWidth()) - 0.5f;
-		y_dir =-std::fabs(y_dir);
+		y_dir =std::fabs(y_dir);
 		x_dir = m;
 		bola_1.setDirection(x_dir, y_dir);
 	}
@@ -526,42 +529,41 @@ void update_bola()
 	if (y_ > jogador_2.getPosition(1) && y_ < jogador_2.getPosition(1) + jogador_2.getHeight() && x_<jogador_2.getPosition(0) + jogador_2.getWidth() && x_>jogador_2.getPosition(0))
 	{
 		GLfloat m = ((x_ - jogador_2.getPosition(0)) / jogador_2.getWidth()) - 0.5f;
-		y_dir =std::fabs(y_dir);
+		y_dir =-std::fabs(y_dir);
 		x_dir = m;
 		bola_1.setDirection(x_dir, y_dir);
 	}
-	*/
 	//verifica se a bola bateu no lado esquerdo da tela
-	if (x_ < 0)
+	if (x_<=0)
 	{
 		x_dir =std::fabs(x_dir);
 		bola_1.setDirection(x_dir,y_dir);
 	}
 	//vertifica se a bola bateu no lado direito da tela
-	if (x_ > width)
+	if (x_ >=width)
 	{
-		x_dir =-fabs(x_dir);
+		x_dir =-std::fabs(x_dir);
 		bola_1.setDirection(x_dir, y_dir);
 	}
 	//verifica se a bola bateu em cima e adiciona pontos ao j1
-	if (y_>height) {
+	if (y_>=height) {
 		score_p1++;
 		x_ = getWidth() / 2;
 		y_ = getHeight() / 2;
-		x_dir = std::fabs(x_dir);
-		y_dir = 0;
+		x_dir =-std::fabs(x_dir);
+		y_dir =-1;
 		bola_1.setPosition(x_,y_);
 		bola_1.setDirection(x_dir, y_dir);
 	}
-	//verifica se a bola bateu em cima e adiciona pontos ao j1
-	if (y_<0) {
+	//verifica se a bola bateu em baixo e adiciona pontos ao j2
+	if (y_<=0) {
 		score_p2++;
 		x_ =getWidth() / 2;
 		y_ = getHeight() / 2;
-		x_dir =-std::fabs(x_dir);
-		y_dir = 0;
+		x_dir =std::fabs(x_dir);
+		y_dir =1;
 		bola_1.setPosition(x_, y_);
 		bola_1.setDirection(x_dir, y_dir);
 	}
-	//normalize_vector2d();
+	normalize_vector2d();
 }
